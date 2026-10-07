@@ -1,0 +1,3 @@
+[functions.verify-donation]
+verify_jwt = false
+entrypoint = "./functions/verify-donation/index.ts"
