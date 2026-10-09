@@ -32,6 +32,9 @@ interface ParsedInstruction {
       destination?: string;
       source?: string;
       amount?: string;
+      tokenAmount?: {
+        amount?: string;
+      };
       multisigAuthority?: string;
       delegate?: string;
     };
@@ -168,7 +171,7 @@ Deno.serve(async (req: Request) => {
             mint: info.mint || "",
             destinationOwner: info.destination || "",
             sourceOwner: info.authority || info.source || "",
-            amount: info.amount || "0",
+            amount: info.tokenAmount?.amount || info.amount || "0",
           };
         }
         break;
@@ -186,7 +189,7 @@ Deno.serve(async (req: Request) => {
                 mint: info.mint || "",
                 destinationOwner: info.destination || "",
                 sourceOwner: info.authority || info.source || "",
-                amount: info.amount || "0",
+                amount: info.tokenAmount?.amount || info.amount || "0",
               };
             }
             break;

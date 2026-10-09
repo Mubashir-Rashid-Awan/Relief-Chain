@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { createCampaignSchema } from '@/lib/validation';
 import { createCampaign } from '@/lib/campaigns';
-import { isPublicKey } from '@/lib/solana/constants';
+import { isPublicKey, USDC_DECIMALS } from '@/lib/solana/constants';
+import { parseTokenAmount } from '@/lib/solana/token';
 
 interface MilestoneInput {
   title: string;
@@ -92,13 +93,25 @@ export function CreateCampaignPage() {
       return;
     }
 
+    let goalAmountBaseUnits: bigint;
+    try {
+      goalAmountBaseUnits = parseTokenAmount(goalAmount, USDC_DECIMALS);
+    } catch {
+      setErrors({ goalAmount: 'Enter a valid goal amount' });
+      return;
+    }
+    if (goalAmountBaseUnits > BigInt(Number.MAX_SAFE_INTEGER)) {
+      setErrors({ goalAmount: 'Goal amount is too large' });
+      return;
+    }
+
     setSubmitting(true);
     try {
       const campaign = await createCampaign({
         title: data.title,
         description: data.description,
         category: data.category,
-        goalAmount: data.goalAmount,
+        goalAmount: Number(goalAmountBaseUnits),
         recipientWallet: data.recipientWallet,
         imageUrl: data.imageUrl,
         milestones: data.milestones,
