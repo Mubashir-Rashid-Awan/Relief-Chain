@@ -8,7 +8,7 @@ import {
 } from '@solana/spl-token';
 import {
   SOLANA_RPC_URL,
-  USDC_DECIMALS,
+  TEST_TOKEN_DECIMALS,
 } from './constants';
 
 export { PublicKey };
@@ -122,7 +122,7 @@ export async function buildTransferInstructions(
       recipientATA,
       sender,
       rawAmount,
-      USDC_DECIMALS,
+      TEST_TOKEN_DECIMALS,
       [],
       TOKEN_PROGRAM_ID
     )
@@ -146,7 +146,7 @@ export function parseTokenAmount(input: string, decimals: number): bigint {
   return BigInt(whole) * BigInt(10) ** BigInt(decimals) + BigInt(paddedFrac || '0');
 }
 
-export function formatTokenAmount(raw: number | bigint, decimals = USDC_DECIMALS): string {
+export function formatTokenAmount(raw: number | bigint, decimals = TEST_TOKEN_DECIMALS): string {
   const rawBig = BigInt(raw);
   const divisor = BigInt(10) ** BigInt(decimals);
   const whole = rawBig / divisor;

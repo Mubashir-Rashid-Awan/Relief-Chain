@@ -6,10 +6,10 @@ export const SOLANA_RPC_URL =
 export const SOLANA_NETWORK =
   import.meta.env.VITE_SOLANA_NETWORK || 'devnet';
 
-export const USDC_MINT_ADDRESS = import.meta.env.VITE_USDC_MINT_ADDRESS || '';
+export const TEST_TOKEN_MINT_ADDRESS = import.meta.env.VITE_TEST_TOKEN_MINT_ADDRESS || '';
 
-export const USDC_DECIMALS = parseInt(
-  import.meta.env.VITE_USDC_DECIMALS || '6',
+export const TEST_TOKEN_DECIMALS = parseInt(
+  import.meta.env.VITE_TEST_TOKEN_DECIMALS || '6',
   10
 );
 

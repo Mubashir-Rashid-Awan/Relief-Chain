@@ -158,7 +158,7 @@ export function HomePage() {
             {[
               { num: '01', icon: <Search size={22} />, title: 'Choose a Campaign', desc: 'Browse verified humanitarian campaigns.' },
               { num: '02', icon: <Wallet size={22} />, title: 'Connect Wallet', desc: 'Connect your Phantom Solana wallet.' },
-              { num: '03', icon: <Coins size={22} />, title: 'Donate USDC', desc: 'Sign a real SPL token transfer.' },
+              { num: '03', icon: <Coins size={22} />, title: 'Donate Test Token', desc: 'Sign a real SPL test token transfer.' },
               { num: '04', icon: <ShieldCheck size={22} />, title: 'Verify Transaction', desc: 'Backend confirms it on Solana RPC.' },
               { num: '05', icon: <TrendingUp size={22} />, title: 'Track Impact', desc: 'Watch the public dashboard update.' },
             ].map((step) => (

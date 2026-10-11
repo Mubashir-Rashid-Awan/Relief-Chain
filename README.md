@@ -21,10 +21,11 @@ ReliefChain records every donation as a real SPL token transfer on Solana. Each 
 ## Features
 
 - **Real Solana Wallet Connection** — Connect Phantom or any Solana-compatible wallet
-- **Real SPL Token Donations** — Donations are actual USDC token transfers on Solana Devnet
+- **SPL Test Token Donations** — Donations are actual test token transfers on Solana Devnet
 - **On-Chain Transaction Verification** — Backend independently verifies each transaction against Solana RPC
 - **Public Transparency Dashboard** — Every number comes from verified on-chain donations
 - **Campaign Transparency Pages** — Per-campaign donation history with Solana Explorer links
+- **Automatic Milestone Progress** — Milestones advance in order as verified donations reach their cumulative Test Token targets
 - **Campaign Creation** — Create campaigns with milestones and categories
 - **Duplicate Prevention** — Each transaction signature can only be recorded once
 - **Solana Network Status** — Live RPC connectivity indicator
@@ -55,7 +56,7 @@ DONOR
   ↓
 SOLANA WALLET (Phantom)
   ↓
-USDC / SPL TOKEN TRANSFER
+TEST TOKEN / SPL TOKEN TRANSFER
   ↓
 SOLANA DEVNET
   ↓
@@ -91,6 +92,10 @@ PUBLIC TRANSPARENCY DASHBOARD
 13. Campaign totals and transparency dashboard update
 14. Success screen with Solana Explorer link
 
+### Milestone Progress
+
+Set each milestone's cumulative Test Token target when creating a campaign. The first unmet milestone is shown as **in progress**, later milestones remain **pending**, and each milestone is marked **completed** in order as verified donations bring the campaign total to its target.
+
 ### Why This Architecture?
 
 - **No custodial wallet** — The donor's wallet signs every transaction. The backend never receives private keys.
@@ -108,7 +113,7 @@ ReliefChain uses Solana meaningfully:
 - **Associated Token Accounts** — Proper ATA handling, including idempotent ATA creation if the recipient doesn't have one yet
 - **On-chain verification** — The backend fetches the full transaction from Solana RPC using `getTransaction` with `jsonParsed` encoding and inspects the parsed instructions
 - **Token decimals** — Amounts are handled as bigint base units, never floating point
-- **Configurable mint** — The USDC token mint is configurable via environment variables
+- **Configurable mint** — The test token mint is configurable via environment variables
 
 ### Wallet Integration
 
@@ -200,8 +205,8 @@ Required variables:
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon key (pre-configured) |
 | `VITE_SOLANA_NETWORK` | Solana network (devnet, testnet, mainnet-beta) |
 | `VITE_SOLANA_RPC_URL` | Solana RPC endpoint URL |
-| `VITE_USDC_MINT_ADDRESS` | SPL token mint address for USDC/test token |
-| `VITE_USDC_DECIMALS` | Token decimals (6 for USDC) |
+| `VITE_TEST_TOKEN_MINT_ADDRESS` | SPL token mint address for your test token |
+| `VITE_TEST_TOKEN_DECIMALS` | Number of decimal places used by your test token (commonly 6) |
 | `VITE_SOLANA_EXPLORER_CLUSTER` | Cluster parameter for Solana Explorer links |
 
 Optional:
@@ -232,7 +237,7 @@ You need Devnet SOL to pay for transaction fees (creating token accounts, transf
 
 ### Configure the Token Mint
 
-ReliefChain needs an SPL token mint address for donations. Since there is no official USDC mint on Devnet that is widely available for testing, you should create your own test token.
+ReliefChain needs an SPL token mint address for donations. Create your own test token on Devnet and configure its mint address.
 
 #### Option A: Create a Test Token with Solana CLI
 
@@ -251,7 +256,7 @@ spl-token create-token --decimals 6
 # Signature: ...
 
 # Copy the mint address and set it in your .env:
-# VITE_USDC_MINT_ADDRESS=TokenMintAddress
+# VITE_TEST_TOKEN_MINT_ADDRESS=TokenMintAddress
 
 # Create your token account
 spl-token create-account <TokenMintAddress>
@@ -264,11 +269,11 @@ spl-token mint <TokenMintAddress> 10000
 
 #### Option B: Use an Existing Devnet Token
 
-If you already have an SPL token on Devnet, just set its mint address in `VITE_USDC_MINT_ADDRESS`.
+If you already have an SPL token on Devnet, set its mint address in `VITE_TEST_TOKEN_MINT_ADDRESS`.
 
 ### Important Notes
 
-- The UI clearly displays **"Devnet Test Token"** — this is not real USDC
+- The UI clearly displays **"Test Token"** to distinguish it from real-world currency
 - Token amounts are handled as bigint base units (no floating point)
 - The configured mint is validated against the actual transaction during verification
 
@@ -328,8 +333,8 @@ ReliefChain is designed to be Vercel-friendly. The database is cloud-hosted (Sup
    - `VITE_SUPABASE_ANON_KEY` — your Supabase anon key
    - `VITE_SOLANA_NETWORK` — `devnet`
    - `VITE_SOLANA_RPC_URL` — `https://api.devnet.solana.com`
-   - `VITE_USDC_MINT_ADDRESS` — your test token mint
-   - `VITE_USDC_DECIMALS` — `6`
+   - `VITE_TEST_TOKEN_MINT_ADDRESS` — your test token mint
+   - `VITE_TEST_TOKEN_DECIMALS` — `6`
    - `VITE_SOLANA_EXPLORER_CLUSTER` — `devnet`
 
 4. **Deploy** — Vercel will build the project automatically
@@ -420,7 +425,7 @@ supabase/
 ## Known Limitations
 
 1. **Devnet only** — The app is configured for Solana Devnet. Mainnet deployment would require updating the RPC URL and token mint.
-2. **Test token, not real USDC** — There is no widely available official USDC mint on Devnet. The app uses a configurable test token. The UI clearly labels this as "Devnet Test Token."
+2. **Test token only** — The app uses a configurable SPL test token on Devnet and labels amounts as "Test Token."
 3. **Single wallet provider** — The MVP integrates directly with Phantom. Wallet adapter support for multiple wallets could be added.
 4. **No user authentication** — Campaign creation is open. For production, wallet-based authentication would be added.
 5. **Demo campaign recipient** — The demo campaign uses a placeholder wallet address. Update it to your own wallet before testing donations.
@@ -431,7 +436,7 @@ supabase/
 
 - Multi-wallet support via Solana Wallet Adapter
 - Wallet-based authentication for campaign ownership
-- Mainnet deployment with real USDC
+- Mainnet deployment with a production token
 - Campaign approval workflow for verified organizations
 - Recurring donations via Solana token vesting
 - Milestone-based fund release with multi-sig

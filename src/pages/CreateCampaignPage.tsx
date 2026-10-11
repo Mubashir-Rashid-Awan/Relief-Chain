@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { createCampaignSchema } from '@/lib/validation';
 import { createCampaign } from '@/lib/campaigns';
-import { isPublicKey, USDC_DECIMALS } from '@/lib/solana/constants';
-import { parseTokenAmount } from '@/lib/solana/token';
+import { isPublicKey, TEST_TOKEN_DECIMALS } from '@/lib/solana/constants';
+import { formatTokenAmount, parseTokenAmount } from '@/lib/solana/token';
 
 interface MilestoneInput {
   title: string;
@@ -80,7 +80,12 @@ export function CreateCampaignPage() {
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
       for (const err of result.error.issues) {
-        if (err.path[0] && !fieldErrors[err.path[0] as string]) {
+        if (err.path[0] === 'milestones' && typeof err.path[1] === 'number') {
+          const field = err.path[2];
+          if (typeof field === 'string') {
+            fieldErrors[`milestone-${err.path[1]}-${field}`] = err.message;
+          }
+        } else if (err.path[0] && !fieldErrors[err.path[0] as string]) {
           fieldErrors[err.path[0] as string] = err.message;
         }
       }
@@ -95,7 +100,7 @@ export function CreateCampaignPage() {
 
     let goalAmountBaseUnits: bigint;
     try {
-      goalAmountBaseUnits = parseTokenAmount(goalAmount, USDC_DECIMALS);
+      goalAmountBaseUnits = parseTokenAmount(goalAmount, TEST_TOKEN_DECIMALS);
     } catch {
       setErrors({ goalAmount: 'Enter a valid goal amount' });
       return;
@@ -103,6 +108,28 @@ export function CreateCampaignPage() {
     if (goalAmountBaseUnits > BigInt(Number.MAX_SAFE_INTEGER)) {
       setErrors({ goalAmount: 'Goal amount is too large' });
       return;
+    }
+
+    const normalizedMilestones: MilestoneInput[] = [];
+    for (const [index, milestone] of data.milestones.entries()) {
+      const fractionalDigits = milestone.target.split('.')[1]?.length ?? 0;
+      if (fractionalDigits > TEST_TOKEN_DECIMALS) {
+        setErrors({
+          [`milestone-${index}-target`]: `Test Token supports up to ${TEST_TOKEN_DECIMALS} decimal places`,
+        });
+        return;
+      }
+
+      const targetUnits = parseTokenAmount(milestone.target, TEST_TOKEN_DECIMALS);
+      if (targetUnits <= 0n) {
+        setErrors({ [`milestone-${index}-target`]: 'Target must be greater than zero' });
+        return;
+      }
+
+      normalizedMilestones.push({
+        ...milestone,
+        target: formatTokenAmount(targetUnits, TEST_TOKEN_DECIMALS),
+      });
     }
 
     setSubmitting(true);
@@ -114,7 +141,7 @@ export function CreateCampaignPage() {
         goalAmount: Number(goalAmountBaseUnits),
         recipientWallet: data.recipientWallet,
         imageUrl: data.imageUrl,
-        milestones: data.milestones,
+        milestones: normalizedMilestones,
       });
       navigate(`/campaign/${campaign.slug}`);
     } catch (err) {
@@ -196,7 +223,7 @@ export function CreateCampaignPage() {
 
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-white/70">
-                    Goal Amount (USDC)
+                    Goal Amount (Test Token)
                   </label>
                   <input
                     type="number"
@@ -284,12 +311,22 @@ export function CreateCampaignPage() {
                     className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-cyan-400/50 focus:outline-none"
                   />
                   <input
-                    type="text"
+                    type="number"
+                    min={10 ** -TEST_TOKEN_DECIMALS}
+                    step={10 ** -TEST_TOKEN_DECIMALS}
                     value={m.target}
                     onChange={(e) => updateMilestone(i, 'target', e.target.value)}
-                    placeholder="Target metric (optional)"
+                    placeholder="e.g. 500"
                     className="mt-2 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 focus:border-cyan-400/50 focus:outline-none"
                   />
+                  <p className="mt-1 text-xs text-white/40">
+                    Cumulative target amount (Test Token)
+                  </p>
+                  {errors[`milestone-${i}-target`] && (
+                    <p className="mt-1 text-xs text-red-400">
+                      {errors[`milestone-${i}-target`]}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

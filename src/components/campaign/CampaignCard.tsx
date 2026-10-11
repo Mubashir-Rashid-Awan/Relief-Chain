@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';
 import { formatTokenAmount } from '@/lib/solana/token';
-import { USDC_DECIMALS } from '@/lib/solana/constants';
+import { TEST_TOKEN_DECIMALS } from '@/lib/solana/constants';
 import type { Campaign } from '@/types';
 
 interface CampaignCardProps {
@@ -55,10 +55,10 @@ export function CampaignCard({
           <div className="mt-4">
             <div className="flex items-center justify-between text-sm">
               <span className="font-semibold text-white">
-                ${formatTokenAmount(totalRaised, USDC_DECIMALS)}
+                {formatTokenAmount(totalRaised, TEST_TOKEN_DECIMALS)} Test Token
               </span>
               <span className="text-white/40">
-                of ${formatTokenAmount(goalAmount, USDC_DECIMALS)}
+                of {formatTokenAmount(goalAmount, TEST_TOKEN_DECIMALS)} Test Token
               </span>
             </div>
             <Progress value={totalRaised} max={goalAmount} className="mt-2" />

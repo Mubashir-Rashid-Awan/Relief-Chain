@@ -19,7 +19,7 @@ import { SectionHeading } from '@/components/ui/SectionHeading';
 import { FullPageSpinner, EmptyState } from '@/components/ui/Feedback';
 import { getTransparencyStats, getCampaignRows } from '@/lib/campaigns';
 import { formatTokenAmount } from '@/lib/solana/token';
-import { USDC_DECIMALS } from '@/lib/solana/constants';
+import { TEST_TOKEN_DECIMALS } from '@/lib/solana/constants';
 import type { TransparencyStats } from '@/types';
 
 interface CampaignRowData {
@@ -85,9 +85,9 @@ export function TransparencyDashboardPage() {
           />
           <StatCard
             label="Total Donated"
-            value={`$${formatTokenAmount(stats?.total_amount ?? 0, USDC_DECIMALS)}`}
+            value={`${formatTokenAmount(stats?.total_amount ?? 0, TEST_TOKEN_DECIMALS)} Test Token`}
             icon={<Coins size={20} />}
-            sublabel="Test USDC on Devnet"
+            sublabel="Test Token on Devnet"
           />
         </div>
 
@@ -145,10 +145,10 @@ export function TransparencyDashboardPage() {
                           <p className="mt-0.5 text-xs text-white/40">{row.category}</p>
                         </td>
                         <td className="py-4 pr-4 text-white/60">
-                          ${formatTokenAmount(row.goal_amount, USDC_DECIMALS)}
+                          {formatTokenAmount(row.goal_amount, TEST_TOKEN_DECIMALS)} Test Token
                         </td>
                         <td className="py-4 pr-4 font-semibold text-white">
-                          ${formatTokenAmount(row.total_raised, USDC_DECIMALS)}
+                          {formatTokenAmount(row.total_raised, TEST_TOKEN_DECIMALS)} Test Token
                         </td>
                         <td className="py-4 pr-4">
                           <span className="inline-flex items-center gap-1 text-white/60">

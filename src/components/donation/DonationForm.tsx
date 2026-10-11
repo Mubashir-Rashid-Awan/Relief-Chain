@@ -18,8 +18,8 @@ import { useWallet } from '@/lib/wallet/WalletContext';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import {
-  USDC_MINT_ADDRESS,
-  USDC_DECIMALS,
+  TEST_TOKEN_MINT_ADDRESS,
+  TEST_TOKEN_DECIMALS,
   getExplorerUrl,
   SOLANA_NETWORK,
 } from '@/lib/solana/constants';
@@ -70,9 +70,9 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
       return;
     }
 
-    if (!USDC_MINT_ADDRESS) {
+    if (!TEST_TOKEN_MINT_ADDRESS) {
       setErrorMsg(
-        'Token mint address is not configured. Set VITE_USDC_MINT_ADDRESS in your environment.'
+        'Token mint address is not configured. Set VITE_TEST_TOKEN_MINT_ADDRESS in your environment.'
       );
       return;
     }
@@ -93,7 +93,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
 
       let rawAmount: bigint;
       try {
-        rawAmount = parseTokenAmount(trimmedAmount, USDC_DECIMALS);
+        rawAmount = parseTokenAmount(trimmedAmount, TEST_TOKEN_DECIMALS);
       } catch {
         setErrorMsg('Invalid amount format');
         setState('error');
@@ -106,7 +106,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
         return;
       }
 
-      const balance = await getTokenBalance(conn, address, USDC_MINT_ADDRESS);
+      const balance = await getTokenBalance(conn, address, TEST_TOKEN_MINT_ADDRESS);
       if (!balance) {
         setErrorMsg(
           'No token balance found. Make sure you have test tokens in your wallet on Devnet.'
@@ -116,7 +116,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
       }
       if (balance.amount < rawAmount) {
         setErrorMsg(
-          `Insufficient balance. You have ${formatTokenAmount(balance.amount, USDC_DECIMALS)} but tried to send ${formatTokenAmount(rawAmount, USDC_DECIMALS)}.`
+          `Insufficient balance. You have ${formatTokenAmount(balance.amount, TEST_TOKEN_DECIMALS)} but tried to send ${formatTokenAmount(rawAmount, TEST_TOKEN_DECIMALS)}.`
         );
         setState('error');
         return;
@@ -127,7 +127,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
         conn,
         address,
         campaign.recipient_wallet,
-        USDC_MINT_ADDRESS,
+        TEST_TOKEN_MINT_ADDRESS,
         rawAmount
       );
 
@@ -170,7 +170,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
             signature,
             donorWallet: address,
             expectedAmount: rawAmount.toString(),
-            tokenMint: USDC_MINT_ADDRESS,
+            tokenMint: TEST_TOKEN_MINT_ADDRESS,
             recipientWallet: campaign.recipient_wallet,
           }),
         }
@@ -229,11 +229,11 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
           <h3 className="text-lg font-bold text-white">Donate with Solana</h3>
         </div>
 
-        {!USDC_MINT_ADDRESS && (
+        {!TEST_TOKEN_MINT_ADDRESS && (
           <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-300">
             <Info size={16} className="mt-0.5 shrink-0" />
             <span>
-              Token mint not configured. Set <code>VITE_USDC_MINT_ADDRESS</code> in your
+              Token mint not configured. Set <code>VITE_TEST_TOKEN_MINT_ADDRESS</code> in your
               environment to enable donations.
             </span>
           </div>
@@ -259,7 +259,7 @@ export function DonationForm({ campaign, onDonationVerified }: DonationFormProps
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-lg text-white placeholder-white/30 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 disabled:opacity-50"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-white/40">
-                USDC
+                Test Token
               </span>
             </div>
           </div>

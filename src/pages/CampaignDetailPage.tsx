@@ -17,8 +17,9 @@ import { FullPageSpinner, EmptyState } from '@/components/ui/Feedback';
 import { DonationForm } from '@/components/donation/DonationForm';
 import { getCampaignWithStats } from '@/lib/campaigns';
 import { formatTokenAmount } from '@/lib/solana/token';
+import { formatMilestoneTarget, getMilestonesWithProgress } from '@/lib/milestones';
 import {
-  USDC_DECIMALS,
+  TEST_TOKEN_DECIMALS,
   shortenAddress,
   getExplorerUrl,
   getExplorerAddressUrl,
@@ -77,6 +78,7 @@ export function CampaignDetailPage() {
     campaign.goal_amount > 0
       ? Math.min((campaign.total_raised / campaign.goal_amount) * 100, 100)
       : 0;
+  const milestones = getMilestonesWithProgress(campaign.milestones, campaign.total_raised);
 
   return (
     <div className="min-h-screen bg-[#070f1e] pt-20">
@@ -126,13 +128,13 @@ export function CampaignDetailPage() {
                 <div>
                   <p className="text-xs text-white/40">Raised</p>
                   <p className="mt-1 text-2xl font-bold text-white">
-                    ${formatTokenAmount(campaign.total_raised, USDC_DECIMALS)}
+                    {formatTokenAmount(campaign.total_raised, TEST_TOKEN_DECIMALS)} Test Token
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-white/40">Goal</p>
                   <p className="mt-1 text-2xl font-bold text-white">
-                    ${formatTokenAmount(campaign.goal_amount, USDC_DECIMALS)}
+                    {formatTokenAmount(campaign.goal_amount, TEST_TOKEN_DECIMALS)} Test Token
                   </p>
                 </div>
                 <div>
@@ -164,7 +166,7 @@ export function CampaignDetailPage() {
               <Card className="p-6">
                 <h2 className="text-lg font-bold text-white">Milestones</h2>
                 <div className="mt-4 space-y-3">
-                  {campaign.milestones.map((m, i) => (
+                  {milestones.map((m, i) => (
                     <div
                       key={m.id}
                       className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/5 p-4"
@@ -190,8 +192,10 @@ export function CampaignDetailPage() {
                         {m.description && (
                           <p className="mt-1 text-sm text-white/50">{m.description}</p>
                         )}
-                        {m.target && (
-                          <p className="mt-1 text-xs text-cyan-400">Target: {m.target}</p>
+                        {formatMilestoneTarget(m.target) && (
+                          <p className="mt-1 text-xs text-cyan-400">
+                            Target: {formatMilestoneTarget(m.target)}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -258,7 +262,7 @@ export function CampaignDetailPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold text-white">
-                          ${formatTokenAmount(d.amount, USDC_DECIMALS)}
+                          {formatTokenAmount(d.amount, TEST_TOKEN_DECIMALS)} Test Token
                         </p>
                         <a
                           href={getExplorerUrl(d.signature)}

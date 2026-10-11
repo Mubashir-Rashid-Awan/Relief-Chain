@@ -8,7 +8,7 @@ relief and donation platform built on Solana.
 
 ### campaigns
 Stores humanitarian donation campaigns. Each campaign has a goal amount
-(in USDC base units), a recipient Solana wallet address, category, image,
+(in test token base units), a recipient Solana wallet address, category, image,
 and status. The `is_demo` flag marks seeded demo campaigns.
 
 ### milestones

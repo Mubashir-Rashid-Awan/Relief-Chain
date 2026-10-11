@@ -30,7 +30,7 @@ export function HowItWorksPage() {
     },
     {
       icon: <Coins size={24} />,
-      title: '3. Donate with USDC',
+      title: '3. Donate with Test Token',
       desc: 'Enter your donation amount and click "Donate with Solana." The app creates a real SPL token transfer transaction. Your wallet asks you to sign it.',
     },
     {

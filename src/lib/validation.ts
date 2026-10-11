@@ -37,7 +37,10 @@ export const createCampaignSchema = z.object({
       z.object({
         title: z.string().min(2, 'Milestone title must be at least 2 characters'),
         description: z.string().optional().or(z.literal('')),
-        target: z.string().optional().or(z.literal('')),
+        target: z
+          .string()
+          .min(1, 'Milestone target is required')
+          .regex(/^\d+(?:\.\d+)?$/, 'Enter a valid Test Token amount'),
       })
     )
     .max(10, 'Maximum 10 milestones')

@@ -18,8 +18,9 @@ import { StatCard } from '@/components/ui/StatCard';
 import { FullPageSpinner, EmptyState } from '@/components/ui/Feedback';
 import { getCampaignWithStats } from '@/lib/campaigns';
 import { formatTokenAmount } from '@/lib/solana/token';
+import { formatMilestoneTarget, getMilestonesWithProgress } from '@/lib/milestones';
 import {
-  USDC_DECIMALS,
+  TEST_TOKEN_DECIMALS,
   shortenAddress,
   getExplorerUrl,
   getExplorerAddressUrl,
@@ -78,6 +79,7 @@ export function CampaignTransparencyPage() {
     campaign.goal_amount > 0
       ? Math.min((campaign.total_raised / campaign.goal_amount) * 100, 100)
       : 0;
+  const milestones = getMilestonesWithProgress(campaign.milestones, campaign.total_raised);
 
   return (
     <div className="min-h-screen bg-[#070f1e] pt-20">
@@ -103,11 +105,11 @@ export function CampaignTransparencyPage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Goal"
-            value={`$${formatTokenAmount(campaign.goal_amount, USDC_DECIMALS)}`}
+            value={`${formatTokenAmount(campaign.goal_amount, TEST_TOKEN_DECIMALS)} Test Token`}
           />
           <StatCard
             label="Total Raised"
-            value={`$${formatTokenAmount(campaign.total_raised, USDC_DECIMALS)}`}
+            value={`${formatTokenAmount(campaign.total_raised, TEST_TOKEN_DECIMALS)} Test Token`}
             icon={<BadgeCheck size={18} />}
           />
           <StatCard label="Donations" value={campaign.donation_count} />
@@ -118,10 +120,10 @@ export function CampaignTransparencyPage() {
         <Card className="mt-6 p-6">
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold text-white">
-              ${formatTokenAmount(campaign.total_raised, USDC_DECIMALS)} raised
+              {formatTokenAmount(campaign.total_raised, TEST_TOKEN_DECIMALS)} Test Token raised
             </span>
             <span className="text-white/40">
-              {pct.toFixed(1)}% of ${formatTokenAmount(campaign.goal_amount, USDC_DECIMALS)}
+              {pct.toFixed(1)}% of {formatTokenAmount(campaign.goal_amount, TEST_TOKEN_DECIMALS)} Test Token
             </span>
           </div>
           <Progress value={campaign.total_raised} max={campaign.goal_amount} className="mt-3" />
@@ -132,7 +134,7 @@ export function CampaignTransparencyPage() {
           <Card className="mt-6 p-6">
             <h2 className="text-lg font-bold text-white">Milestones</h2>
             <div className="mt-4 space-y-3">
-              {campaign.milestones.map((m, i) => (
+              {milestones.map((m, i) => (
                 <div
                   key={m.id}
                   className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/5 p-4"
@@ -156,6 +158,11 @@ export function CampaignTransparencyPage() {
                       </Badge>
                     </div>
                     {m.description && <p className="mt-1 text-sm text-white/50">{m.description}</p>}
+                    {formatMilestoneTarget(m.target) && (
+                      <p className="mt-1 text-xs text-cyan-400">
+                        Target: {formatMilestoneTarget(m.target)}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -218,7 +225,7 @@ export function CampaignTransparencyPage() {
                         </span>
                       </td>
                       <td className="py-3 pr-4 font-semibold text-white">
-                        ${formatTokenAmount(d.amount, USDC_DECIMALS)}
+                        {formatTokenAmount(d.amount, TEST_TOKEN_DECIMALS)} Test Token
                       </td>
                       <td className="py-3 pr-4 text-xs text-white/50">
                         {new Date(d.created_at).toLocaleDateString()}
